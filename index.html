@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<link rel="manifest" href="./manifest.json"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="Arsenal"/>
@@ -5127,70 +5128,11 @@ function updateRegistryNameDisplay() {
 
 // ── PWA: MANIFEST & SERVICE WORKER ────────────────────────────────────────────
 (function initPWA() {
-  // Inject web app manifest as blob
-  var manifest = {
-    name: 'Firearm Collection Registry',
-    short_name: 'Registry',
-    description: 'Personal firearm collection tracker',
-    start_url: './',
-    display: 'standalone',
-    background_color: '#221508',
-    theme_color: '#221508',
-    orientation: 'any',
-    icons: [
-      {
-        src: 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192"><rect width="192" height="192" fill="#221508" rx="24"/><text y="148" font-size="140" x="96" text-anchor="middle" font-family="serif">⚜</text></svg>'),
-        sizes: '192x192',
-        type: 'image/svg+xml',
-        purpose: 'any maskable'
-      },
-      {
-        src: 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" fill="#221508" rx="48"/><text y="400" font-size="380" x="256" text-anchor="middle" font-family="serif">⚜</text></svg>'),
-        sizes: '512x512',
-        type: 'image/svg+xml',
-        purpose: 'any maskable'
-      }
-    ]
-  };
-  var blob = new Blob([JSON.stringify(manifest)], {type: 'application/json'});
-  var url = URL.createObjectURL(blob);
-  var link = document.createElement('link');
-  link.rel = 'manifest';
-  link.href = url;
-  document.head.appendChild(link);
-
-  // Register service worker (inlined as blob)
+  // Register proper service worker file (sw.js must be in same directory as index.html)
   if ('serviceWorker' in navigator) {
-    var swCode = [
-      'var CACHE = "fc-cache-v1";',
-      'var SHELL = ["./"];',
-      'self.addEventListener("install", function(e) {',
-      '  e.waitUntil(caches.open(CACHE).then(function(c) { return c.addAll(SHELL); }));',
-      '  self.skipWaiting();',
-      '});',
-      'self.addEventListener("activate", function(e) {',
-      '  e.waitUntil(caches.keys().then(function(keys) {',
-      '    return Promise.all(keys.filter(function(k){return k!==CACHE;}).map(function(k){return caches.delete(k);}));',
-      '  }));',
-      '  self.clients.claim();',
-      '});',
-      'self.addEventListener("fetch", function(e) {',
-      '  var url = e.request.url;',
-      '  if (url.indexOf("script.google.com") !== -1) { return; }',
-      '  if (url.indexOf("fonts.googleapis.com") !== -1 || url.indexOf("fonts.gstatic.com") !== -1) {',
-      '    e.respondWith(caches.open(CACHE).then(function(c) {',
-      '      return c.match(e.request).then(function(r) {',
-      '        return r || fetch(e.request).then(function(nr) { c.put(e.request, nr.clone()); return nr; });',
-      '      });',
-      '    }));',
-      '    return;',
-      '  }',
-      '  e.respondWith(caches.match(e.request).then(function(r) { return r || fetch(e.request); }));',
-      '});'
-    ].join('\n');
-    var swBlob = new Blob([swCode], {type: 'application/javascript'});
-    var swUrl = URL.createObjectURL(swBlob);
-    navigator.serviceWorker.register(swUrl).catch(function(){});
+    navigator.serviceWorker.register('./sw.js').catch(function(err) {
+      console.warn('SW registration failed:', err);
+    });
   }
 })();
 
