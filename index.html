@@ -1978,6 +1978,8 @@ function setSyncStatus(state) {
 
 // ── LOGIN ────────────────────────────────────────────────────────────────────
 async function init() {
+  // Always re-read API from localStorage at init time (PWA cache can stale the module-level var)
+  API = localStorage.getItem(API_KEY) || '';
   updateRegistryNameDisplay();
   if (!API) {
     hideLoading();
@@ -5284,6 +5286,8 @@ var _settingThemePref = null;
 function openSetupSettings() { openSettings(); }
 
 function openSettings() {
+  // Make sure setup wizard is never visible when opening settings
+  hideSetupScreen();
   // Populate fields with current values
   document.getElementById('pref-registry-name').value = localStorage.getItem(REGISTRY_NAME_KEY) || '';
   document.getElementById('pref-owner-name').value = localStorage.getItem(OWNER_NAME_KEY) || '';

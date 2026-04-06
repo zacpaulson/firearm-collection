@@ -1,4 +1,4 @@
-var CACHE = 'fc-cache-v1';
+var CACHE = 'fc-cache-v2';
 var SHELL = ['./'];
 
 self.addEventListener('install', function(e) {
