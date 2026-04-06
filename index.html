@@ -602,6 +602,43 @@
     #main-app { padding:0.75rem 0.6rem; }
   }
 
+  /* ── SETTINGS MODAL ── */
+  .settings-overlay { display:none; position:fixed; inset:0; z-index:15000; background:rgba(0,0,0,0.75); align-items:center; justify-content:center; padding:1rem; }
+  .settings-overlay.active { display:flex; }
+  .settings-modal { background:linear-gradient(160deg,#2a1f14,#1a1208); border:1px solid var(--gold-dim); border-top:2px solid var(--gold); border-radius:4px; width:100%; max-width:520px; max-height:90vh; overflow-y:auto; font-family:'Libre Baskerville',serif; animation: modalSlideUp 0.2s ease; }
+  body.tactical .settings-modal { background:linear-gradient(160deg,#0a160a,#060e06); }
+  body.daylight .settings-modal { background:linear-gradient(160deg,#f5ece0,#ede0cc); }
+  body.industrial .settings-modal { background:linear-gradient(160deg,#1e293b,#0f172a); }
+  .settings-header { display:flex; align-items:center; justify-content:space-between; padding:1.25rem 1.5rem 1rem; border-bottom:1px solid var(--wood-border); }
+  .settings-title { font-family:'Playfair Display',serif; color:var(--gold); font-size:1.1rem; letter-spacing:0.08em; }
+  .settings-body { padding:1.25rem 1.5rem; }
+  .settings-section { margin-bottom:1.5rem; }
+  .settings-section-title { font-size:0.68rem; letter-spacing:0.28em; text-transform:uppercase; color:var(--gold-dim); margin-bottom:0.9rem; padding-bottom:0.4rem; border-bottom:1px solid var(--wood-border); }
+  .settings-row { margin-bottom:0.9rem; }
+  .settings-label { font-size:0.78rem; color:var(--text-dim); margin-bottom:0.3rem; display:block; }
+  .settings-input { width:100%; background:#0d0800; border:1px solid var(--wood-border2); border-radius:3px; padding:0.55rem 0.75rem; color:var(--text-bright); font-family:'Libre Baskerville',serif; font-size:0.85rem; outline:none; transition:border-color 0.2s; box-sizing:border-box; }
+  body.daylight .settings-input { background:#f0e8d8; color:#2a1a08; border-color:#c8a870; }
+  body.industrial .settings-input { background:#0f172a; color:#e2e8f0; border-color:#334155; }
+  .settings-input:focus { border-color:var(--gold-dim); }
+  .settings-select { width:100%; background:#0d0800; border:1px solid var(--wood-border2); border-radius:3px; padding:0.55rem 0.75rem; color:var(--text-bright); font-family:'Libre Baskerville',serif; font-size:0.85rem; outline:none; cursor:pointer; box-sizing:border-box; }
+  body.daylight .settings-select { background:#f0e8d8; color:#2a1a08; border-color:#c8a870; }
+  body.industrial .settings-select { background:#0f172a; color:#e2e8f0; border-color:#334155; }
+  .settings-theme-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; }
+  .settings-theme-btn { padding:0.5rem; border:1px solid var(--wood-border); border-radius:3px; background:transparent; color:var(--text-dim); font-family:'Libre Baskerville',serif; font-size:0.78rem; cursor:pointer; text-align:center; transition:all 0.15s; }
+  .settings-theme-btn:hover { border-color:var(--gold-dim); color:var(--text-bright); }
+  .settings-theme-btn.active { border-color:var(--gold); color:var(--gold); background:rgba(224,184,78,0.08); }
+  .settings-hint { font-size:0.72rem; color:var(--text-muted); margin-top:0.3rem; font-style:italic; }
+  .settings-footer { display:flex; gap:0.75rem; padding:1rem 1.5rem 1.25rem; border-top:1px solid var(--wood-border); }
+  .settings-save-btn { flex:1; padding:0.65rem; background:linear-gradient(135deg,#8B6914,#5a3e0a); border:1px solid var(--gold); color:#f5e6b0; border-radius:2px; cursor:pointer; font-family:'Libre Baskerville',serif; font-size:0.85rem; letter-spacing:0.08em; transition:opacity 0.15s; }
+  .settings-save-btn:hover { opacity:0.85; }
+  .settings-cancel-btn { padding:0.65rem 1.2rem; background:transparent; border:1px solid var(--wood-border2); color:var(--text-dim); border-radius:2px; cursor:pointer; font-family:'Libre Baskerville',serif; font-size:0.85rem; transition:opacity 0.15s; }
+  .settings-cancel-btn:hover { opacity:0.75; }
+  .settings-danger-btn { width:100%; padding:0.55rem; background:transparent; border:1px solid #5a2020; color:#cc6666; border-radius:2px; cursor:pointer; font-family:'Libre Baskerville',serif; font-size:0.78rem; transition:opacity 0.15s; margin-top:0.4rem; }
+  .settings-danger-btn:hover { background:rgba(90,32,32,0.3); }
+  .settings-url-display { font-family:'Courier New',monospace; font-size:0.7rem; color:var(--text-muted); word-break:break-all; background:#0d0800; padding:0.4rem 0.6rem; border-radius:3px; border:1px solid var(--wood-border); margin-bottom:0.5rem; }
+  body.daylight .settings-url-display { background:#f0e8d8; color:#8a6030; border-color:#c8a870; }
+  body.industrial .settings-url-display { background:#0f172a; color:#64748b; border-color:#334155; }
+
   /* NFA icon fix - use text symbol matching other tabs */
   #tab-nfa::before { content:''; }
 
@@ -715,11 +752,111 @@
   </div>
 </div>
 
+<!-- SETTINGS MODAL -->
+<div class="settings-overlay" id="settings-overlay" onclick="if(event.target===this)closeSettings()">
+  <div class="settings-modal">
+    <div class="settings-header">
+      <div class="settings-title">⚙ Preferences</div>
+      <button class="modal-close" onclick="closeSettings()">✕</button>
+    </div>
+    <div class="settings-body">
+
+      <!-- IDENTITY -->
+      <div class="settings-section">
+        <div class="settings-section-title">Identity</div>
+        <div class="settings-row">
+          <label class="settings-label">Registry Name</label>
+          <input class="settings-input" id="pref-registry-name" placeholder="e.g. Paulson Personal Registry" maxlength="60"/>
+          <div class="settings-hint">Shown in the app header and on PDF exports.</div>
+        </div>
+        <div class="settings-row">
+          <label class="settings-label">Your Name</label>
+          <input class="settings-input" id="pref-owner-name" placeholder="e.g. Zac Paulson" maxlength="60"/>
+          <div class="settings-hint">Used on PDF exports and the login greeting.</div>
+        </div>
+      </div>
+
+      <!-- APPEARANCE -->
+      <div class="settings-section">
+        <div class="settings-section-title">Appearance</div>
+        <div class="settings-row">
+          <label class="settings-label">Default Theme</label>
+          <div class="settings-theme-grid">
+            <button class="settings-theme-btn" id="theme-opt-elegant" onclick="selectThemePref('elegant')">⚜ Elegant</button>
+            <button class="settings-theme-btn" id="theme-opt-tactical" onclick="selectThemePref('tactical')">◈ Tactical</button>
+            <button class="settings-theme-btn" id="theme-opt-daylight" onclick="selectThemePref('daylight')">☀ Daylight</button>
+            <button class="settings-theme-btn" id="theme-opt-industrial" onclick="selectThemePref('industrial')">⚙ Industrial</button>
+          </div>
+          <div class="settings-hint">Applied on every launch. You can still cycle themes with the header button.</div>
+        </div>
+      </div>
+
+      <!-- BEHAVIOUR -->
+      <div class="settings-section">
+        <div class="settings-section-title">Behaviour</div>
+        <div class="settings-row">
+          <label class="settings-label">Default Tab on Open</label>
+          <select class="settings-select" id="pref-default-tab">
+            <option value="dashboard">◈ Dashboard</option>
+            <option value="firearms">⚙ Firearms</option>
+            <option value="nfa">❖ NFA Items</option>
+            <option value="ammo">◎ Ammunition</option>
+            <option value="acc">✦ Accessories</option>
+            <option value="reload">⚗ Reloading</option>
+            <option value="recipe">⊕ Load Recipes</option>
+            <option value="rangelog">⊙ Range Log</option>
+            <option value="maintenance">⛭ Maintenance</option>
+            <option value="notes">✎ Notes</option>
+          </select>
+          <div class="settings-hint">Which tab opens first after logging in.</div>
+        </div>
+        <div class="settings-row">
+          <label class="settings-label">Currency Symbol</label>
+          <select class="settings-select" id="pref-currency">
+            <option value="$">$ — US Dollar</option>
+            <option value="£">£ — British Pound</option>
+            <option value="€">€ — Euro</option>
+            <option value="C$">C$ — Canadian Dollar</option>
+            <option value="A$">A$ — Australian Dollar</option>
+            <option value="CHF">CHF — Swiss Franc</option>
+            <option value="¥">¥ — Japanese Yen</option>
+            <option value="kr">kr — Norwegian/Swedish Krone</option>
+          </select>
+          <div class="settings-hint">Used on all value displays and PDF exports.</div>
+        </div>
+      </div>
+
+      <!-- BACKEND -->
+      <div class="settings-section">
+        <div class="settings-section-title">Backend Connection</div>
+        <div class="settings-row">
+          <label class="settings-label">Apps Script URL</label>
+          <div class="settings-url-display" id="pref-url-display">—</div>
+          <button class="settings-danger-btn" onclick="closeSettings();showSetupScreen()">⟳ Change Apps Script URL</button>
+          <div class="settings-hint">Opens the setup wizard to reconnect to a different backend.</div>
+        </div>
+      </div>
+
+      <!-- ACCOUNT -->
+      <div class="settings-section">
+        <div class="settings-section-title">Account</div>
+        <button class="settings-danger-btn" onclick="closeSettings();openChangePwd()">🔑 Change Password</button>
+        <button class="settings-danger-btn" style="margin-top:0.5rem" onclick="closeSettings();doLogout()">⎋ Sign Out</button>
+      </div>
+
+    </div>
+    <div class="settings-footer">
+      <button class="settings-cancel-btn" onclick="closeSettings()">Cancel</button>
+      <button class="settings-save-btn" onclick="saveSettings()">⚜ Save Preferences</button>
+    </div>
+  </div>
+</div>
+
 <!-- LOGIN -->
 <div id="login-screen">
   <div class="login-box">
     <div class="login-emblem">⚜</div>
-    <div class="login-title">Firearm Collection</div>
+    <div class="login-title"><span id="login-title-text">Firearm Collection</span></div>
     <div class="login-sub" id="login-registry-name">Firearm Collection Registry</div>
     <div id="first-run-msg" class="first-run-note" style="display:none">
       <strong style="color:var(--gold)">First time setup:</strong> Create a password to secure your collection. You'll use this every time you open the app on any device.
@@ -1775,7 +1912,11 @@
 const SESSION_KEY = "fc_pwd";
 const API_KEY = "fc_api_url";
 const REGISTRY_NAME_KEY = "fc_registry_name";
+const OWNER_NAME_KEY = "fc_owner_name";
+const CURRENCY_KEY = "fc_currency";
+const DEFAULT_TAB_KEY = "fc_default_tab";
 let API = localStorage.getItem(API_KEY) || "";
+function getCurrency() { return localStorage.getItem(CURRENCY_KEY) || '$'; }
 
 let guns = [];
 let editId = null;
@@ -1938,6 +2079,8 @@ async function showApp() {
     document.getElementById('app-footer').style.display = 'block';
     renderTable();
     renderDashboard();
+    const defaultTab = localStorage.getItem(DEFAULT_TAB_KEY) || 'dashboard';
+    if (defaultTab !== 'dashboard') switchTab(defaultTab);
     setSyncStatus('synced');
   } catch(e) {
     hideLoading();
@@ -1993,7 +2136,7 @@ function toInputDate(val) {
 
 function fmt(v) {
   if (v===''||v===null||v===undefined||isNaN(parseFloat(v))) return '—';
-  return '$'+parseFloat(v).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  return getCurrency()+parseFloat(v).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
 }
 function fmtGL(v) {
   // Returns triangle + formatted value; caller sets .gain/.loss class for color
@@ -5131,9 +5274,84 @@ function updateRegistryNameDisplay() {
   if (el) el.textContent = name;
   var loginSub = document.getElementById('login-registry-name');
   if (loginSub) loginSub.textContent = name;
+  // Update login greeting with owner name if set
+  var owner = localStorage.getItem(OWNER_NAME_KEY) || '';
+  var loginTitle = document.getElementById('login-title-text');
+  if (loginTitle) loginTitle.textContent = owner ? 'Welcome back, ' + owner.split(' ')[0] : 'Firearm Collection';
+  // Update page title
+  document.title = name;
 }
 
-// ── PWA: MANIFEST & SERVICE WORKER ────────────────────────────────────────────
+// ── SETTINGS MODAL ────────────────────────────────────────────────────────────
+var _settingThemePref = null;
+
+function openSetupSettings() { openSettings(); }
+
+function openSettings() {
+  // Populate fields with current values
+  document.getElementById('pref-registry-name').value = localStorage.getItem(REGISTRY_NAME_KEY) || '';
+  document.getElementById('pref-owner-name').value = localStorage.getItem(OWNER_NAME_KEY) || '';
+  document.getElementById('pref-default-tab').value = localStorage.getItem(DEFAULT_TAB_KEY) || 'dashboard';
+  document.getElementById('pref-currency').value = localStorage.getItem(CURRENCY_KEY) || '$';
+  var url = localStorage.getItem(API_KEY) || '';
+  document.getElementById('pref-url-display').textContent = url ? url.substring(0, 60) + (url.length > 60 ? '…' : '') : 'Not configured';
+  // Theme buttons
+  _settingThemePref = localStorage.getItem('fc_theme') || 'elegant';
+  ['elegant','tactical','daylight','industrial'].forEach(function(t) {
+    var btn = document.getElementById('theme-opt-' + t);
+    if (btn) btn.classList.toggle('active', t === _settingThemePref);
+  });
+  document.getElementById('settings-overlay').classList.add('active');
+}
+
+function closeSettings() {
+  document.getElementById('settings-overlay').classList.remove('active');
+  _settingThemePref = null;
+}
+
+function selectThemePref(theme) {
+  _settingThemePref = theme;
+  ['elegant','tactical','daylight','industrial'].forEach(function(t) {
+    var btn = document.getElementById('theme-opt-' + t);
+    if (btn) btn.classList.toggle('active', t === theme);
+  });
+}
+
+function saveSettings() {
+  var regName = document.getElementById('pref-registry-name').value.trim();
+  var ownerName = document.getElementById('pref-owner-name').value.trim();
+  var defTab = document.getElementById('pref-default-tab').value;
+  var currency = document.getElementById('pref-currency').value;
+
+  // Save all prefs
+  if (regName) { localStorage.setItem(REGISTRY_NAME_KEY, regName); }
+  else { localStorage.removeItem(REGISTRY_NAME_KEY); }
+
+  if (ownerName) { localStorage.setItem(OWNER_NAME_KEY, ownerName); }
+  else { localStorage.removeItem(OWNER_NAME_KEY); }
+
+  localStorage.setItem(DEFAULT_TAB_KEY, defTab);
+  localStorage.setItem(CURRENCY_KEY, currency);
+
+  // Apply theme if changed
+  if (_settingThemePref) {
+    localStorage.setItem('fc_theme', _settingThemePref);
+    applyTheme();
+  }
+
+  updateRegistryNameDisplay();
+
+  // Re-render everything to pick up currency change
+  renderTable();
+  renderNfaTable();
+  renderAmmoTable();
+  renderAccTable();
+  renderDashboard();
+  renderGrandSummary();
+
+  closeSettings();
+  showSuccessToast('Preferences saved ✓');
+}
 (function initPWA() {
   // Register proper service worker file (sw.js must be in same directory as index.html)
   if ('serviceWorker' in navigator) {
