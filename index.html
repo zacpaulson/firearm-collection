@@ -680,7 +680,7 @@
     <div class="setup-step">
       <div class="setup-step-label"><span class="setup-step-num">1</span>Name Your Registry</div>
       <div class="setup-desc">Give your registry a personal name (optional — shown in the app header).</div>
-      <input class="setup-input" id="setup-name" placeholder="e.g. Paulson Personal Registry" maxlength="60"/>
+      <input class="setup-input" id="setup-name" placeholder="e.g. My Personal Registry" maxlength="60"/>
       <div class="setup-optional">Optional — you can change this later in Settings.</div>
     </div>
 
@@ -720,7 +720,7 @@
   <div class="login-box">
     <div class="login-emblem">⚜</div>
     <div class="login-title">Firearm Collection</div>
-    <div class="login-sub">Paulson Personal Registry</div>
+    <div class="login-sub" id="login-registry-name">Firearm Collection Registry</div>
     <div id="first-run-msg" class="first-run-note" style="display:none">
       <strong style="color:var(--gold)">First time setup:</strong> Create a password to secure your collection. You'll use this every time you open the app on any device.
     </div>
@@ -3787,7 +3787,8 @@ function pdfOpen(title) {
   return win;
 }
 function pdfClose(win, date) {
-  win.document.write(`<div class="footer">Paulson Personal Registry &nbsp;·&nbsp; Generated ${date} &nbsp;·&nbsp; Confidential</div><script>window.onload=()=>setTimeout(()=>window.print(),400);<\/script></body></html>`);
+  const rName = localStorage.getItem(REGISTRY_NAME_KEY) || 'Firearm Collection Registry';
+  win.document.write(`<div class="footer">${rName} &nbsp;·&nbsp; Generated ${date} &nbsp;·&nbsp; Confidential</div><script>window.onload=()=>setTimeout(()=>window.print(),400);<\/script></body></html>`);
   win.document.close();
 }
 
@@ -3801,11 +3802,12 @@ function exportPDF() {
   const nwTotal    = nwFirearms + nwNfa + nwAcc + nwAmmo;
   const totalInvested = ownedGuns.reduce((s,g)=>s+(parseFloat(g.purchasePrice)||0),0);
   const date = new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
-  const win = pdfOpen('Paulson Personal Registry — Full Collection Report');
+  const rName = localStorage.getItem(REGISTRY_NAME_KEY) || 'Firearm Collection Registry';
+  const win = pdfOpen(rName + ' — Full Collection Report');
   win.document.write(`
     <div class="pdf-header">
       <div class="pdf-emblem">⚜</div>
-      <h1>Paulson Personal Registry</h1>
+      <h1>${rName}</h1>
       <div class="pdf-sub">Full Collection Report</div>
       <div class="pdf-date">${date}</div>
     </div>
@@ -4599,11 +4601,12 @@ function exportSoldReport() {
   const totalPaid = soldGuns.reduce((s,g)=>s+(parseFloat(g.purchasePrice)||0),0);
   const totalSold = soldGuns.reduce((s,g)=>s+(parseFloat(g.sellPrice)||0),0);
   const totalPL   = totalSold - totalPaid;
-  const win = pdfOpen('Paulson Personal Registry — Sold Firearms Report');
+  const win = pdfOpen((localStorage.getItem(REGISTRY_NAME_KEY)||'Firearm Collection Registry') + ' — Sold Firearms Report');
+  const rName = localStorage.getItem(REGISTRY_NAME_KEY) || 'Firearm Collection Registry';
   win.document.write(`
     <div class="pdf-header">
       <div class="pdf-emblem">⚜</div>
-      <h1>Paulson Personal Registry</h1>
+      <h1>${rName}</h1>
       <div class="pdf-sub">Sold Firearms Report</div>
       <div class="pdf-date">${date}</div>
     </div>
@@ -4653,11 +4656,12 @@ function exportInsurancePDF() {
     + nfa.reduce((s,n)=>s+(parseFloat(n.currentValue)||0),0)
     + acc.reduce((s,a)=>s+(parseFloat(a.currentValue)||0),0);
   const win = pdfOpen('Insurance Valuation Report');
+  const rName = localStorage.getItem(REGISTRY_NAME_KEY) || 'Firearm Collection Registry';
   win.document.write(`
     <div class="pdf-header">
       <div class="pdf-emblem">⚜</div>
       <h1>Insurance Valuation Report</h1>
-      <div class="pdf-sub">Paulson Personal Registry</div>
+      <div class="pdf-sub">${rName}</div>
       <div class="pdf-date">${date}</div>
     </div>
     <p style="font-size:0.8rem;color:#7a5a2a;margin-bottom:1.5rem;line-height:1.6">This report is prepared for insurance documentation purposes. Values represent owner estimates and may not reflect current market prices. For official appraisal, consult a licensed firearms dealer or appraiser.</p>
@@ -4674,13 +4678,14 @@ function exportInsurancePDF() {
     <div class="summary-grid" style="margin-top:1.5rem">
       <div class="summary-card total" style="grid-column:1/-1"><div class="card-label">Total Estimated Replacement Value</div><div class="card-value">${fmt(totalValue)}</div></div>
     </div>
-    <p style="font-size:0.72rem;color:#9a7848;margin-top:1.5rem;line-height:1.6;font-style:italic">Owner: Paulson &nbsp;·&nbsp; Prepared: ${date} &nbsp;·&nbsp; This document should be kept with your insurance policy records.</p>
+    <p style="font-size:0.72rem;color:#9a7848;margin-top:1.5rem;line-height:1.6;font-style:italic">Registry: ${localStorage.getItem(REGISTRY_NAME_KEY)||'Firearm Collection Registry'} &nbsp;·&nbsp; Prepared: ${date} &nbsp;·&nbsp; This document should be kept with your insurance policy records.</p>
   `);
   pdfClose(win, date);
 }
 
 function exportNfaRegistryPDF() {
   const date = new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+  const rName = localStorage.getItem(REGISTRY_NAME_KEY) || 'Firearm Collection Registry';
   const sbrs  = nfa.filter(n=>n.nfaType&&n.nfaType!=='Suppressor');
   const supps = nfa.filter(n=>n.nfaType==='Suppressor');
   const totalStamp = nfa.reduce((s,n)=>s+(parseFloat(n.taxStamp)||0),0);
@@ -4722,7 +4727,7 @@ function exportNfaRegistryPDF() {
     <div class="pdf-header">
       <div class="pdf-emblem">❖</div>
       <h1>NFA Item Registry</h1>
-      <div class="pdf-sub">Paulson Personal Registry</div>
+      <div class="pdf-sub">${rName}</div>
       <div class="pdf-date">${date}</div>
     </div>
     <p style="font-size:0.8rem;color:#7a5a2a;margin-bottom:1.5rem;line-height:1.6;background:#fdf5e4;border:1px solid #c4a060;border-left:3px solid #8B5E0A;padding:0.75rem 1rem;border-radius:2px">
@@ -4737,7 +4742,7 @@ function exportNfaRegistryPDF() {
     </div>
     ${nfaSection(sbrs, 'Registered Firearms (SBR / SBS / MG / AOW)')}
     ${nfaSection(supps, 'Suppressors')}
-    <p style="font-size:0.72rem;color:#9a7848;margin-top:2rem;line-height:1.6;font-style:italic">Owner: Paulson &nbsp;·&nbsp; Prepared: ${date} &nbsp;·&nbsp; This document is CONFIDENTIAL — contains sensitive legal information regarding registered NFA items.</p>
+    <p style="font-size:0.72rem;color:#9a7848;margin-top:2rem;line-height:1.6;font-style:italic">Registry: ${rName} &nbsp;·&nbsp; Prepared: ${date} &nbsp;·&nbsp; This document is CONFIDENTIAL — contains sensitive legal information regarding registered NFA items.</p>
   `);
   pdfClose(win, date);
 }
@@ -4920,7 +4925,7 @@ const DEMO_GUNS = [
 
 const DEMO_NFA = [
   {id:8001,nickname:'Big Can',nfaType:'Suppressor',manufacturer:'SilencerCo',serialNumber:'SCA10042',caliber:'5.56 NATO',taxStamp:'200',purchasePrice:'999',currentValue:'850',formType:'Form 4',approvalDate:'2022-05-18',registrationType:'Individual',trustName:'',notes:'Switchback 22/30 compatible',model:'Omega 36M',purchasedFrom:'Silencer Shop',purchaseDate:'2021-09-01',purchaseLocation:'Austin, TX',purchaseNotes:'Kiosk purchase'},
-  {id:8002,nickname:'The SBR',nfaType:'Short-Barreled Rifle (SBR)',manufacturer:'Daniel Defense',serialNumber:'DD-SBR-042',caliber:'5.56 NATO',taxStamp:'200',purchasePrice:'1999',currentValue:'1850',formType:'Form 1',approvalDate:'2021-11-30',registrationType:'Trust',trustName:'Paulson NFA Trust',notes:'10.3 inch barrel',model:'DDM4 PDW',purchasedFrom:'Form 1',purchaseDate:'2021-06-15',purchaseLocation:'Nashville, TN',purchaseNotes:'Built on registered lower'}
+  {id:8002,nickname:'The SBR',nfaType:'Short-Barreled Rifle (SBR)',manufacturer:'Daniel Defense',serialNumber:'DD-SBR-042',caliber:'5.56 NATO',taxStamp:'200',purchasePrice:'1999',currentValue:'1850',formType:'Form 1',approvalDate:'2021-11-30',registrationType:'Trust',trustName:'Personal NFA Trust',notes:'10.3 inch barrel',model:'DDM4 PDW',purchasedFrom:'Form 1',purchaseDate:'2021-06-15',purchaseLocation:'Nashville, TN',purchaseNotes:'Built on registered lower'}
 ];
 
 const DEMO_AMMO = [
@@ -5124,6 +5129,8 @@ function updateRegistryNameDisplay() {
   var name = localStorage.getItem(REGISTRY_NAME_KEY) || 'Firearm Collection Registry';
   var el = document.getElementById('registry-name-display');
   if (el) el.textContent = name;
+  var loginSub = document.getElementById('login-registry-name');
+  if (loginSub) loginSub.textContent = name;
 }
 
 // ── PWA: MANIFEST & SERVICE WORKER ────────────────────────────────────────────
