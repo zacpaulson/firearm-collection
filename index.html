@@ -680,6 +680,8 @@
   .setup-optional { color: var(--text-faint); font-size: 0.72rem; margin-top: 0.3rem; }
   .setup-settings-link { text-align: center; margin-top: 1.25rem; font-size: 0.75rem; color: var(--text-muted); }
   .setup-settings-link button { background: none; border: none; color: var(--gold-dim); cursor: pointer; font-family: inherit; font-size: inherit; text-decoration: underline; }
+  .setup-resource-btn { display: inline-block; padding: 0.4rem 0.85rem; background: rgba(0,0,0,0.35); border: 1px solid var(--wood-border2); border-radius: 3px; color: var(--gold-dim); font-size: 0.75rem; font-family: 'Libre Baskerville', serif; letter-spacing: 0.05em; text-decoration: none; transition: border-color 0.15s, color 0.15s; }
+  .setup-resource-btn:hover { border-color: var(--gold); color: var(--text-bright); }
 
   /* ── PWA INSTALL BUTTON ── */
   #pwa-install-btn {
@@ -734,10 +736,14 @@
       <div class="setup-desc">
         <strong style="color:var(--gold-dim)">Step-by-step:</strong><br/>
         1. Go to <strong>script.google.com</strong> and create a new project<br/>
-        2. Paste the <strong>Code.gs</strong> backend code (see README for the full code)<br/>
+        2. Paste the <strong>Code.gs</strong> backend code into the editor<br/>
         3. Click <strong>Deploy → New Deployment → Web App</strong><br/>
         4. Set "Who has access" to <strong>Anyone</strong><br/>
         5. Copy the deployment URL and paste it below
+      </div>
+      <div class="setup-desc" style="display:flex;gap:0.6rem;flex-wrap:wrap;margin-top:0.75rem;">
+        <a href="https://raw.githubusercontent.com/zacpaulson/firearm-collection/main/Code.gs" target="_blank" rel="noopener" class="setup-resource-btn">📄 View Code.gs</a>
+        <a href="https://github.com/zacpaulson/firearm-collection/blob/main/README.md" target="_blank" rel="noopener" class="setup-resource-btn">📖 Setup Guide (README)</a>
       </div>
     </div>
 
