@@ -1764,7 +1764,7 @@
         <label class="form-label">Target Photos</label>
         <div id="range-photo-grid" style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.5rem"></div>
         <button type="button" class="btn btn-ghost btn-sm" onclick="document.getElementById('range-photo-input').click()">+ Add Target Photo</button>
-        <button type="button" class="btn btn-ghost btn-sm" style="margin-left:0.4rem" onclick="document.getElementById('range-photo-input-camera').click()">📷 Take Photo</button>
+        <button type="button" class="btn btn-ghost btn-sm" style="margin-left:0.4rem" onclick="launchCamera(handleRangePhotos)">📷 Take Photo</button>
         <input type="file" id="range-photo-input" accept="image/*" multiple style="display:none" onchange="handleRangePhotos(event)"/>
       </div>
     </div>
@@ -2330,7 +2330,7 @@ function renderPhotoGrid(){
   document.getElementById('photo-grid').innerHTML=
     editImages.map((img,i)=>`<div class="photo-thumb"><img src="${img}" alt=""/><button class="photo-remove" onclick="removePhoto(${i})">✕</button></div>`).join('')+
     `<button class="photo-add" title="Choose from library" onclick="document.getElementById('photo-input').click()">+</button>`+
-    `<button class="photo-add-camera" title="Take a photo" onclick="document.getElementById('photo-input-camera').click()">📷<span>Camera</span></button>`;
+    `<button class="photo-add-camera" title="Take a photo" onclick="launchCamera(handlePhotos)">📷<span>Camera</span></button>`;
 }
 function removePhoto(i){ editImages.splice(i,1); renderPhotoGrid(); }
 function handlePhotos(e){
@@ -2857,7 +2857,7 @@ function renderAccPhotoGrid(){
   document.getElementById('acc-photo-grid').innerHTML=
     accImages.map((img,i)=>`<div class="photo-thumb"><img src="${img}" alt=""/><button class="photo-remove" onclick="removeAccPhoto(${i})">✕</button></div>`).join('')+
     `<button class="photo-add" title="Choose from library" onclick="document.getElementById('acc-photo-input').click()">+</button>`+
-    `<button class="photo-add-camera" title="Take a photo" onclick="document.getElementById('acc-photo-input-camera').click()">📷<span>Camera</span></button>`;
+    `<button class="photo-add-camera" title="Take a photo" onclick="launchCamera(handleAccPhotos)">📷<span>Camera</span></button>`;
 }
 function removeAccPhoto(i){ accImages.splice(i,1); renderAccPhotoGrid(); }
 function handleAccPhotos(e){
@@ -3247,7 +3247,7 @@ function renderNfaPhotoGrid(){
   document.getElementById('nfa-photo-grid').innerHTML=
     nfaImages.map((img,i)=>`<div class="photo-thumb"><img src="${img}" alt=""/><button class="photo-remove" onclick="removeNfaPhoto(${i})">✕</button></div>`).join('')+
     `<button class="photo-add" title="Choose from library" onclick="document.getElementById('nfa-photo-input').click()">+</button>`+
-    `<button class="photo-add-camera" title="Take a photo" onclick="document.getElementById('nfa-photo-input-camera').click()">📷<span>Camera</span></button>`;
+    `<button class="photo-add-camera" title="Take a photo" onclick="launchCamera(handleNfaPhotos)">📷<span>Camera</span></button>`;
 }
 function removeNfaPhoto(i){ nfaImages.splice(i,1); renderNfaPhotoGrid(); }
 function handleNfaPhotos(e){
@@ -5401,10 +5401,26 @@ initDarkModeAutoDetect();
 if(!navigator.onLine) showOfflineBanner(true);
 init();
 </script>
-<!-- Camera inputs outside all modals for reliable Android capture -->
-<input type="file" id="photo-input-camera" accept="image/*" capture="environment" style="display:none" onchange="handlePhotos(event)"/>
-<input type="file" id="acc-photo-input-camera" accept="image/*" capture="environment" style="display:none" onchange="handleAccPhotos(event)"/>
-<input type="file" id="nfa-photo-input-camera" accept="image/*" capture="environment" style="display:none" onchange="handleNfaPhotos(event)"/>
-<input type="file" id="range-photo-input-camera" accept="image/*" capture="environment" style="display:none" onchange="handleRangePhotos(event)"/>
+<script>
+// Dynamic camera launcher — creates a fresh input each time for reliable Android capture
+function launchCamera(handler) {
+  // Remove any previously created dynamic camera input
+  var old = document.getElementById('_dynamic_camera_input');
+  if (old) old.parentNode.removeChild(old);
+  var inp = document.createElement('input');
+  inp.type = 'file';
+  inp.id = '_dynamic_camera_input';
+  inp.accept = 'image/*';
+  inp.setAttribute('capture', 'environment');
+  inp.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0;width:1px;height:1px;';
+  inp.addEventListener('change', function(e) {
+    handler(e);
+    setTimeout(function(){ if(inp.parentNode) inp.parentNode.removeChild(inp); }, 1000);
+  });
+  document.body.appendChild(inp);
+  // Small timeout ensures DOM is ready before triggering
+  setTimeout(function(){ inp.click(); }, 50);
+}
+</script>
 </body>
 </html>
