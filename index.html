@@ -414,8 +414,6 @@
   .photo-thumb img { width:80px; height:60px; object-fit:cover; border:1px solid var(--wood-border2); border-radius:2px; display:block; }
   .photo-remove { position:absolute; top:-6px; right:-6px; background:#8B1a1a; border:none; color:#fff; border-radius:50%; width:18px; height:18px; cursor:pointer; font-size:0.65rem; line-height:18px; text-align:center; }
   .photo-add { width:80px; height:60px; background:#160f07; border:2px dashed var(--wood-border2); color:var(--text-muted); border-radius:2px; cursor:pointer; font-size:1.4rem; display:flex; align-items:center; justify-content:center; }
-  .photo-add-camera { width:80px; height:60px; background:#160f07; border:2px dashed var(--wood-border2); color:var(--text-muted); border-radius:2px; cursor:pointer; font-size:1.2rem; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; }
-  .photo-add-camera span { font-size:0.5rem; letter-spacing:0.05em; text-transform:uppercase; }
   .modal-actions { display:flex; justify-content:flex-end; gap:0.75rem; margin-top:1.5rem; }
 
   /* DETAIL */
@@ -1763,8 +1761,7 @@
       <div class="form-group full">
         <label class="form-label">Target Photos</label>
         <div id="range-photo-grid" style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.5rem"></div>
-        <button type="button" class="btn btn-ghost btn-sm" onclick="document.getElementById('range-photo-input').click()">+ Add Target Photo</button>
-        <button type="button" class="btn btn-ghost btn-sm" style="margin-left:0.4rem" onclick="launchCamera(handleRangePhotos)">📷 Take Photo</button>
+        <button type="button" class="btn btn-ghost btn-sm" onclick="document.getElementById('range-photo-input').click()">+ Add Photo</button>
         <input type="file" id="range-photo-input" accept="image/*" multiple style="display:none" onchange="handleRangePhotos(event)"/>
       </div>
     </div>
@@ -2329,8 +2326,7 @@ function toggleSoldFields(){
 function renderPhotoGrid(){
   document.getElementById('photo-grid').innerHTML=
     editImages.map((img,i)=>`<div class="photo-thumb"><img src="${img}" alt=""/><button class="photo-remove" onclick="removePhoto(${i})">✕</button></div>`).join('')+
-    `<button class="photo-add" title="Choose from library" onclick="document.getElementById('photo-input').click()">+</button>`+
-    `<button class="photo-add-camera" title="Take a photo" onclick="launchCamera(handlePhotos)">📷<span>Camera</span></button>`;
+    `<button class="photo-add" title="Add photo" onclick="document.getElementById('photo-input').click()">+</button>`;
 }
 function removePhoto(i){ editImages.splice(i,1); renderPhotoGrid(); }
 function handlePhotos(e){
@@ -2856,8 +2852,7 @@ function closeAccModal(){ document.getElementById('acc-modal').classList.remove(
 function renderAccPhotoGrid(){
   document.getElementById('acc-photo-grid').innerHTML=
     accImages.map((img,i)=>`<div class="photo-thumb"><img src="${img}" alt=""/><button class="photo-remove" onclick="removeAccPhoto(${i})">✕</button></div>`).join('')+
-    `<button class="photo-add" title="Choose from library" onclick="document.getElementById('acc-photo-input').click()">+</button>`+
-    `<button class="photo-add-camera" title="Take a photo" onclick="launchCamera(handleAccPhotos)">📷<span>Camera</span></button>`;
+    `<button class="photo-add" title="Add photo" onclick="document.getElementById('acc-photo-input').click()">+</button>`;
 }
 function removeAccPhoto(i){ accImages.splice(i,1); renderAccPhotoGrid(); }
 function handleAccPhotos(e){
@@ -3246,8 +3241,7 @@ function closeNfaModal(){ const m=document.getElementById('nfa-modal'); delete m
 function renderNfaPhotoGrid(){
   document.getElementById('nfa-photo-grid').innerHTML=
     nfaImages.map((img,i)=>`<div class="photo-thumb"><img src="${img}" alt=""/><button class="photo-remove" onclick="removeNfaPhoto(${i})">✕</button></div>`).join('')+
-    `<button class="photo-add" title="Choose from library" onclick="document.getElementById('nfa-photo-input').click()">+</button>`+
-    `<button class="photo-add-camera" title="Take a photo" onclick="launchCamera(handleNfaPhotos)">📷<span>Camera</span></button>`;
+    `<button class="photo-add" title="Add photo" onclick="document.getElementById('nfa-photo-input').click()">+</button>`;
 }
 function removeNfaPhoto(i){ nfaImages.splice(i,1); renderNfaPhotoGrid(); }
 function handleNfaPhotos(e){
@@ -5400,27 +5394,6 @@ applyTheme();
 initDarkModeAutoDetect();
 if(!navigator.onLine) showOfflineBanner(true);
 init();
-</script>
-<script>
-// Dynamic camera launcher — creates a fresh input each time for reliable Android capture
-function launchCamera(handler) {
-  // Remove any previously created dynamic camera input
-  var old = document.getElementById('_dynamic_camera_input');
-  if (old) old.parentNode.removeChild(old);
-  var inp = document.createElement('input');
-  inp.type = 'file';
-  inp.id = '_dynamic_camera_input';
-  inp.accept = 'image/*';
-  inp.setAttribute('capture', 'environment');
-  inp.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0;width:1px;height:1px;';
-  inp.addEventListener('change', function(e) {
-    handler(e);
-    setTimeout(function(){ if(inp.parentNode) inp.parentNode.removeChild(inp); }, 1000);
-  });
-  document.body.appendChild(inp);
-  // Small timeout ensures DOM is ready before triggering
-  setTimeout(function(){ inp.click(); }, 50);
-}
 </script>
 </body>
 </html>
