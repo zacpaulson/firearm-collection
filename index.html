@@ -1501,7 +1501,6 @@
       <label class="photos-label">Photos</label>
       <div class="photo-grid" id="photo-grid"></div>
       <input type="file" id="photo-input" accept="image/*" multiple style="display:none" onchange="handlePhotos(event)"/>
-      <input type="file" id="photo-input-camera" accept="image/*" capture="environment" style="display:none" onchange="handlePhotos(event)"/>
     </div>
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeEditModal()">Cancel</button>
@@ -1633,7 +1632,6 @@
       <label class="photos-label">Photos</label>
       <div class="photo-grid" id="acc-photo-grid"></div>
       <input type="file" id="acc-photo-input" accept="image/*" multiple style="display:none" onchange="handleAccPhotos(event)"/>
-      <input type="file" id="acc-photo-input-camera" accept="image/*" capture="environment" style="display:none" onchange="handleAccPhotos(event)"/>
     </div>
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeAccModal()">Cancel</button>
@@ -1716,7 +1714,6 @@
       <label class="photos-label">Photos</label>
       <div class="photo-grid" id="nfa-photo-grid"></div>
       <input type="file" id="nfa-photo-input" accept="image/*" multiple style="display:none" onchange="handleNfaPhotos(event)"/>
-      <input type="file" id="nfa-photo-input-camera" accept="image/*" capture="environment" style="display:none" onchange="handleNfaPhotos(event)"/>
     </div>
 
     <div class="modal-actions">
@@ -1769,7 +1766,6 @@
         <button type="button" class="btn btn-ghost btn-sm" onclick="document.getElementById('range-photo-input').click()">+ Add Target Photo</button>
         <button type="button" class="btn btn-ghost btn-sm" style="margin-left:0.4rem" onclick="document.getElementById('range-photo-input-camera').click()">📷 Take Photo</button>
         <input type="file" id="range-photo-input" accept="image/*" multiple style="display:none" onchange="handleRangePhotos(event)"/>
-        <input type="file" id="range-photo-input-camera" accept="image/*" capture="environment" style="display:none" onchange="handleRangePhotos(event)"/>
       </div>
     </div>
     <div class="modal-actions">
@@ -5405,5 +5401,10 @@ initDarkModeAutoDetect();
 if(!navigator.onLine) showOfflineBanner(true);
 init();
 </script>
+<!-- Camera inputs outside all modals for reliable Android capture -->
+<input type="file" id="photo-input-camera" accept="image/*" capture="environment" style="display:none" onchange="handlePhotos(event)"/>
+<input type="file" id="acc-photo-input-camera" accept="image/*" capture="environment" style="display:none" onchange="handleAccPhotos(event)"/>
+<input type="file" id="nfa-photo-input-camera" accept="image/*" capture="environment" style="display:none" onchange="handleNfaPhotos(event)"/>
+<input type="file" id="range-photo-input-camera" accept="image/*" capture="environment" style="display:none" onchange="handleRangePhotos(event)"/>
 </body>
 </html>
