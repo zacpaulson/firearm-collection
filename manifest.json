@@ -4,7 +4,7 @@
   "description": "Personal firearm collection tracker",
   "start_url": "./",
   "scope": "./",
-  "display": "standalone",
+  "display": "minimal-ui",
   "background_color": "#221508",
   "theme_color": "#221508",
   "orientation": "any",
