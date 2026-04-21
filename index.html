@@ -681,6 +681,43 @@
   .setup-resource-btn { display: inline-block; padding: 0.4rem 0.85rem; background: rgba(0,0,0,0.35); border: 1px solid var(--wood-border2); border-radius: 3px; color: var(--gold-dim); font-size: 0.75rem; font-family: 'Libre Baskerville', serif; letter-spacing: 0.05em; text-decoration: none; transition: border-color 0.15s, color 0.15s; }
   .setup-resource-btn:hover { border-color: var(--gold); color: var(--text-bright); }
 
+  /* ── IN-APP CAMERA MODAL ── */
+  #camera-modal-overlay {
+    display: none; position: fixed; inset: 0; z-index: 30000;
+    background: #000; flex-direction: column; align-items: center; justify-content: center;
+  }
+  #camera-modal-overlay.active { display: flex; }
+  #camera-video {
+    width: 100%; max-height: 70vh; object-fit: cover; display: block;
+  }
+  #camera-canvas { display: none; }
+  .camera-toolbar {
+    width: 100%; background: #111; padding: 1rem;
+    display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    flex-shrink: 0;
+  }
+  .camera-shutter {
+    width: 64px; height: 64px; border-radius: 50%;
+    background: #fff; border: 4px solid #ccc;
+    cursor: pointer; flex-shrink: 0;
+    transition: transform 0.1s, background 0.1s;
+  }
+  .camera-shutter:active { transform: scale(0.92); background: #ddd; }
+  .camera-flip {
+    background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);
+    color: #fff; border-radius: 50%; width: 44px; height: 44px;
+    cursor: pointer; font-size: 1.2rem; display: flex; align-items: center; justify-content: center;
+  }
+  .camera-close-btn {
+    background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);
+    color: #fff; border-radius: 50%; width: 44px; height: 44px;
+    cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center;
+  }
+  .camera-status {
+    color: #aaa; font-size: 0.75rem; text-align: center; padding: 0.5rem;
+    font-family: 'Libre Baskerville', serif;
+  }
+
   /* ── PWA INSTALL BUTTON ── */
   #pwa-install-btn {
     display: none; position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 8000;
@@ -755,6 +792,18 @@
     <button class="setup-btn" id="setup-btn" onclick="doSetup()">⚜ Connect &amp; Get Started</button>
 
     <div class="setup-settings-link">Already configured? <button onclick="showSetupFromSettings()">Update Settings</button></div>
+  </div>
+</div>
+
+<!-- IN-APP CAMERA MODAL -->
+<div id="camera-modal-overlay">
+  <video id="camera-video" autoplay playsinline muted></video>
+  <canvas id="camera-canvas"></canvas>
+  <div class="camera-status" id="camera-status">Starting camera…</div>
+  <div class="camera-toolbar">
+    <button class="camera-close-btn" onclick="closeCamera()" title="Cancel">✕</button>
+    <button class="camera-shutter" onclick="capturePhoto()" title="Take photo"></button>
+    <button class="camera-flip" onclick="flipCamera()" title="Flip camera">🔄</button>
   </div>
 </div>
 
@@ -1762,6 +1811,7 @@
         <label class="form-label">Target Photos</label>
         <div id="range-photo-grid" style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.5rem"></div>
         <button type="button" class="btn btn-ghost btn-sm" onclick="document.getElementById('range-photo-input').click()">+ Add Photo</button>
+        <button type="button" class="btn btn-ghost btn-sm" style="margin-left:0.4rem" onclick="openCameraForRange()">📷 Camera</button>
         <input type="file" id="range-photo-input" accept="image/*" multiple style="display:none" onchange="handleRangePhotos(event)"/>
       </div>
     </div>
@@ -2326,7 +2376,8 @@ function toggleSoldFields(){
 function renderPhotoGrid(){
   document.getElementById('photo-grid').innerHTML=
     editImages.map((img,i)=>`<div class="photo-thumb"><img src="${img}" alt=""/><button class="photo-remove" onclick="removePhoto(${i})">✕</button></div>`).join('')+
-    `<button class="photo-add" title="Add photo" onclick="document.getElementById('photo-input').click()">+</button>`;
+    `<button class="photo-add" title="Add photo" onclick="document.getElementById('photo-input').click()">+</button>`+
+    `<button class="photo-add" title="Take photo" onclick="openCameraForGun()" style="font-size:1.1rem">📷</button>`;
 }
 function removePhoto(i){ editImages.splice(i,1); renderPhotoGrid(); }
 function handlePhotos(e){
@@ -2852,7 +2903,8 @@ function closeAccModal(){ document.getElementById('acc-modal').classList.remove(
 function renderAccPhotoGrid(){
   document.getElementById('acc-photo-grid').innerHTML=
     accImages.map((img,i)=>`<div class="photo-thumb"><img src="${img}" alt=""/><button class="photo-remove" onclick="removeAccPhoto(${i})">✕</button></div>`).join('')+
-    `<button class="photo-add" title="Add photo" onclick="document.getElementById('acc-photo-input').click()">+</button>`;
+    `<button class="photo-add" title="Add photo" onclick="document.getElementById('acc-photo-input').click()">+</button>`+
+    `<button class="photo-add" title="Take photo" onclick="openCameraForAcc()" style="font-size:1.1rem">📷</button>`;
 }
 function removeAccPhoto(i){ accImages.splice(i,1); renderAccPhotoGrid(); }
 function handleAccPhotos(e){
@@ -3241,7 +3293,8 @@ function closeNfaModal(){ const m=document.getElementById('nfa-modal'); delete m
 function renderNfaPhotoGrid(){
   document.getElementById('nfa-photo-grid').innerHTML=
     nfaImages.map((img,i)=>`<div class="photo-thumb"><img src="${img}" alt=""/><button class="photo-remove" onclick="removeNfaPhoto(${i})">✕</button></div>`).join('')+
-    `<button class="photo-add" title="Add photo" onclick="document.getElementById('nfa-photo-input').click()">+</button>`;
+    `<button class="photo-add" title="Add photo" onclick="document.getElementById('nfa-photo-input').click()">+</button>`+
+    `<button class="photo-add" title="Take photo" onclick="openCameraForNfa()" style="font-size:1.1rem">📷</button>`;
 }
 function removeNfaPhoto(i){ nfaImages.splice(i,1); renderNfaPhotoGrid(); }
 function handleNfaPhotos(e){
@@ -5389,7 +5442,98 @@ function pwaInstall() {
   });
 }
 
-// ── BOOT ──────────────────────────────────────────────────────────────────────
+
+// ── IN-APP CAMERA ─────────────────────────────────────────────────────────────
+var _cameraStream = null;
+var _cameraFacing = 'environment'; // start with rear camera
+var _cameraCallback = null; // function to call with base64 image
+
+function openCamera(callback) {
+  _cameraCallback = callback;
+  document.getElementById('camera-modal-overlay').classList.add('active');
+  _startCameraStream();
+}
+
+function _startCameraStream() {
+  var status = document.getElementById('camera-status');
+  status.textContent = 'Starting camera…';
+  // Stop any existing stream
+  if (_cameraStream) {
+    _cameraStream.getTracks().forEach(function(t){ t.stop(); });
+    _cameraStream = null;
+  }
+  var constraints = {
+    video: { facingMode: _cameraFacing, width: { ideal: 1920 }, height: { ideal: 1080 } },
+    audio: false
+  };
+  navigator.mediaDevices.getUserMedia(constraints).then(function(stream) {
+    _cameraStream = stream;
+    var video = document.getElementById('camera-video');
+    video.srcObject = stream;
+    video.play();
+    status.textContent = 'Tap the button to take a photo';
+  }).catch(function(err) {
+    status.textContent = 'Camera error: ' + err.message + '. Try allowing camera permission.';
+  });
+}
+
+function flipCamera() {
+  _cameraFacing = (_cameraFacing === 'environment') ? 'user' : 'environment';
+  _startCameraStream();
+}
+
+function capturePhoto() {
+  var video = document.getElementById('camera-video');
+  var canvas = document.getElementById('camera-canvas');
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  var ctx = canvas.getContext('2d');
+  // Mirror front camera
+  if (_cameraFacing === 'user') {
+    ctx.translate(canvas.width, 0);
+    ctx.scale(-1, 1);
+  }
+  ctx.drawImage(video, 0, 0);
+  var dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+  closeCamera();
+  if (_cameraCallback) _cameraCallback(dataUrl);
+}
+
+function closeCamera() {
+  document.getElementById('camera-modal-overlay').classList.remove('active');
+  if (_cameraStream) {
+    _cameraStream.getTracks().forEach(function(t){ t.stop(); });
+    _cameraStream = null;
+  }
+  _cameraCallback = null;
+}
+
+// Per-section camera openers
+function openCameraForGun() {
+  openCamera(function(dataUrl) {
+    editImages.push(dataUrl);
+    renderPhotoGrid();
+  });
+}
+function openCameraForAcc() {
+  openCamera(function(dataUrl) {
+    accImages.push(dataUrl);
+    renderAccPhotoGrid();
+  });
+}
+function openCameraForNfa() {
+  openCamera(function(dataUrl) {
+    nfaImages.push(dataUrl);
+    renderNfaPhotoGrid();
+  });
+}
+function openCameraForRange() {
+  openCamera(function(dataUrl) {
+    rangePhotos.push(dataUrl);
+    renderRangePhotoGrid();
+  });
+}
+
 applyTheme();
 initDarkModeAutoDetect();
 if(!navigator.onLine) showOfflineBanner(true);
